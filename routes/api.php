@@ -18,41 +18,41 @@ Route::post('login', [SecurityController::class, 'index']);
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/fournisseur',[FournisseurController::class,'index']);
-    Route::post('/fournisseur/add',[FournisseurController::class,'store']);
-    Route::get('/fournisseur/show/{id}',[FournisseurController::class,'show']);
-    Route::put('/fournisseur/update/{id}',[FournisseurController::class,'update']);
-    Route::delete('/fournisseur/{id}',[FournisseurController::class,'destroy']);
+    Route::post('/fournisseurs',[FournisseurController::class,'index']);
+    Route::post('/fournisseurs/add',[FournisseurController::class,'store']);
+    Route::get('/fournisseurs/{id}',[FournisseurController::class,'show']);
+    Route::put('/fournisseurs/{id}',[FournisseurController::class,'update']);
+    Route::delete('/fournisseurs/{id}',[FournisseurController::class,'destroy']);
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/client',[ClientController::class,'index']);
-    Route::post('/client/add',[ClientController::class,'store']);
-    Route::get('/client/show/{id}',[ClientController::class,'show']);
-    Route::put('/client/update/{id}',[ClientController::class,'update']);
-    Route::delete('/client/{id}',[ClientController::class,'destroy']);
+    Route::post('/clients',[ClientController::class,'index']);
+    Route::post('/clients',[ClientController::class,'store']);
+    Route::get('/clients/{id}',[ClientController::class,'show']);
+    Route::put('/clients/{id}',[ClientController::class,'update']);
+    Route::delete('/clients/{id}',[ClientController::class,'destroy']);
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('/estimate',[EstimateController::class,'index']);
-    Route::post('/estimate/add',[EstimateController::class,'store']);
-    Route::get('/estimate/show/{id}',[EstimateController::class,'show']);
-    Route::put('/estimate/update/{id}',[EstimateController::class,'update']);
-    Route::delete('/estimate/{id}',[EstimateController::class,'destroy']);
-    Route::get('/estimate/next-no',[EstimateController::class,'nextNo']);
+    Route::get('/estimates',[EstimateController::class,'index']);
+    Route::post('/estimates/add',[EstimateController::class,'store']);
+    Route::get('/estimates/{id}',[EstimateController::class,'show']);
+    Route::put('/estimates/{id}',[EstimateController::class,'update']);
+    Route::delete('/estimates/{id}',[EstimateController::class,'destroy']);
+    Route::get('/estimates/next-no',[EstimateController::class,'nextNo']);
 });
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('/invoice',[InvoiceController::class,'index']);
-    Route::post('/invoice/add',[InvoiceController::class,'store']);
-    Route::get('/invoice/show/{id}',[InvoiceController::class,'show']);
-    Route::put('/invoice/update/{id}',[InvoiceController::class,'update']);
-    Route::delete('/invoice/{id}',[InvoiceController::class,'destroy']);
+    Route::get('/invoices',[InvoiceController::class,'index']);
+    Route::post('/invoices/add',[InvoiceController::class,'store']);
+    Route::get('/invoices/{id}',[InvoiceController::class,'show']);
+    Route::put('/invoices/{id}',[InvoiceController::class,'update']);
+    Route::delete('/invoices/{id}',[InvoiceController::class,'destroy']);
 });
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/delivery-notes',[DeliveryNoteController::class,'index']);
     Route::post('/delivery-notes/add',[DeliveryNoteController::class,'store']);
-    Route::get('/delivery-notes/show/{id}',[DeliveryNoteController::class,'show']);
-    Route::put('/delivery-notes/update/{id}',[DeliveryNoteController::class,'update']);
+    Route::get('/delivery-notes/{id}',[DeliveryNoteController::class,'show']);
+    Route::put('/delivery-notes/{id}',[DeliveryNoteController::class,'update']);
     Route::delete('/delivery-notes/{id}',[DeliveryNoteController::class,'destroy']);
     Route::get('/delivery-notes/next-no',[DeliveryNoteController::class,'nextNo']);
 });
