@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained('accounts')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('estimate_id')->constrained('estimates')->onDelete('cascade')->onUpdate('cascade');
             $table->string('description',512);
-            $table->decimal('unity_price',10,2);
+            $table->decimal('unit_price',10,2);
             $table->integer('quantity');
-            $table->string('quantity_unity');
+            $table->string('quantity_unit');
             $table->timestamps();
         });
     }

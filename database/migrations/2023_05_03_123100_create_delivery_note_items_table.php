@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('delivery_note_id')->constrained('delivery_notes')->onDelete('cascade')->onUpdate('cascade');
             $table->string('description',512);
             $table->integer('quantity');
-            $table->string('quantity_unit')->nullable();
+            $table->string('quantity_uni')->nullable();
             $table->timestamps();
         });
     }
