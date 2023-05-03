@@ -29,9 +29,6 @@ class ClientController extends Controller
                     ->orWhere('ice', 'LIKE', "%$keywordParam%");
             });
         }
-        if (isset($dateParam)) {
-            $query->whereDate('created_at', $dateParam);
-        }
         $clients = $query->orderBy('created_at', 'desc')->paginate($pageSize);
 
         return response()->json($clients, JsonResponse::HTTP_OK);
@@ -96,15 +93,25 @@ class ClientController extends Controller
     {
         $accountId = Auth::user()->account_id;
         $client = Client::where('id', $id)->first();
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'ice' => 'required|string|digits:15',
+            'if_no' => 'nullable|string|max:50',
+            'rc_no' => 'nullable|string|max:180|min:2',
+            'cnss_no' => 'nullable|string|max:50|min:10',
+            'address' => 'nullable|string|max:50|min:10',
+            'phone_number' => 'nullable|string|'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
         if (!$client || $client->account_id !== $accountId) {
             return response()->json([
                 'message' => 'This client Not Found'
             ], JsonResponse::HTTP_NOT_FOUND);
         } else {
-            $client->name = '';
-            $client->ice = '';
-            $client->save();
             $client->name = $request->name;
             $client->ice = $request->ice;
             $client->if_no = $request->if_no;
@@ -135,19 +142,4 @@ class ClientController extends Controller
         }
     }
 
-    public function searchClient(Request $request)
-    {
-        $accountId = Auth::user()->account_id;
-        $clients = Client::query()
-            ->where('account_id', $accountId)
-            ->where(function ($query) use ($request) {
-                $query->where('name', 'LIKE', "%$request->search%")
-                    ->orWhere('ice', 'LIKE', "%$request->search%");
-            })
-            ->get();
-        return response()->json($clients);
-        if (!isset($clients)) {
-            return response()->json('the input given doesn\'t match any of our records !', 404);
-        }
-    }
 }
