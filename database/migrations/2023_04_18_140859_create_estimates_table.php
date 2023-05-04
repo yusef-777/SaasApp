@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('issued_at');
             $table->smallInteger('vat');
             $table->string('status')->default('en attente');
-            $table->unique(['account_id', 'client_id', 'no']);
+            $table->unique(['account_id', 'no']);
             $table->timestamps();
         });
     }
