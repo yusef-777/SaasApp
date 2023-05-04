@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade')->onUpdate('cascade');
             $table->date('issued_at');
             $table->smallInteger('vat');
-
+            $table->string('status')->default('en attente');
+            $table->unique(['account_id','no']);
             $table->timestamps();
         });
     }
