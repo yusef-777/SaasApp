@@ -21,6 +21,7 @@ return new class extends Migration
             $table->smallInteger('vat');
             $table->string('status')->default('en attente');
             $table->unique(['account_id','no']);
+            
             $table->timestamps();
         });
     }
