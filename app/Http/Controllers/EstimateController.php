@@ -47,6 +47,21 @@ class EstimateController extends Controller
         $estimate = new Estimate();
         $estimate->account_id = $user->account_id;
         $estimate->created_by = $user->id;
+
+        // if ($request->no === null) {
+        //     $latestEstimate = Estimate::where('account_id', $user->account_id)
+        //         ->where('client_id', $request->client_id)
+        //         ->orderBy('created_at', 'desc')
+        //         ->first();
+        //     if ($latestEstimate) {
+        //         $incrementeNo =  str_pad($latestEstimate->no + 1, 4, '0', STR_PAD_LEFT);
+        //         $estimate->no = $incrementeNo;
+        //     } else {
+        //         $estimate->no = '0001';
+        //     }
+        // } else {
+        // }
+        
         $estimate->no = $request->no;
         $estimate->client_id = $request->client_id;
         $estimate->issued_at = date_create_from_format('d/m/Y', $request->issued_at);
@@ -60,9 +75,9 @@ class EstimateController extends Controller
             $estimateItem->account_id = $user->account_id;
             $estimateItem->estimate_id = $estimate_id;
             $estimateItem->description = $item['description'];
-            $estimateItem->unity_price = $item['unity_price'];
+            $estimateItem->unit_price = $item['unit_price'];
             $estimateItem->quantity = $item['quantity'];
-            $estimateItem->quantity_unity = $item['quantity_unity'];
+            $estimateItem->quantity_unit = $item['quantity_unit'];
             $estimateItem->save();
         }
 
@@ -71,7 +86,7 @@ class EstimateController extends Controller
         return response()->json(array_merge($estimate->toArray(), [
             'client' => $client,
             "items" => $items,
-        ]));
+        ]), 201);
     }
 
     /**
@@ -131,9 +146,9 @@ class EstimateController extends Controller
                     'account_id' => $user->account_id,
                     'estimate_id' => $estimate->id,
                     'description' => $item['description'],
-                    'quantity_unity' => $item['quantity_unity'],
+                    'quantity_unit' => $item['quantity_unit'],
                     'quantity' => $item['quantity'],
-                    'unity_price' => $item['unity_price']
+                    'unit_price' => $item['unit_price']
                 ]
             );
         }
@@ -188,9 +203,9 @@ class EstimateController extends Controller
             'items' => 'required|array',
             'items.*.id' => 'integer',
             'items.*.description' => 'required|string',
-            'items.*.quantity_unity' => 'required|string',
+            'items.*.quantity_unit' => 'required|string',
             'items.*.quantity' => 'required|integer',
-            'items.*.unity_price' => 'required|numeric'
+            'items.*.unit_price' => 'required|numeric'
 
         ]);
     }

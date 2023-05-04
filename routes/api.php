@@ -19,7 +19,7 @@ Route::post('login', [SecurityController::class, 'index']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/fournisseurs',[FournisseurController::class,'index']);
-    Route::post('/fournisseurs/add',[FournisseurController::class,'store']);
+    Route::post('/fournisseurs',[FournisseurController::class,'store']);
     Route::get('/fournisseurs/{id}',[FournisseurController::class,'show']);
     Route::put('/fournisseurs/{id}',[FournisseurController::class,'update']);
     Route::delete('/fournisseurs/{id}',[FournisseurController::class,'destroy']);
@@ -35,7 +35,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/estimates',[EstimateController::class,'index']);
-    Route::post('/estimates/add',[EstimateController::class,'store']);
+    Route::post('/estimates',[EstimateController::class,'store']);
     Route::get('/estimates/{id}',[EstimateController::class,'show']);
     Route::put('/estimates/{id}',[EstimateController::class,'update']);
     Route::delete('/estimates/{id}',[EstimateController::class,'destroy']);
@@ -43,14 +43,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/invoices',[InvoiceController::class,'index']);
-    Route::post('/invoices/add',[InvoiceController::class,'store']);
+    Route::post('/invoices',[InvoiceController::class,'store']);
     Route::get('/invoices/{id}',[InvoiceController::class,'show']);
     Route::put('/invoices/{id}',[InvoiceController::class,'update']);
     Route::delete('/invoices/{id}',[InvoiceController::class,'destroy']);
 });
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/delivery-notes',[DeliveryNoteController::class,'index']);
-    Route::post('/delivery-notes/add',[DeliveryNoteController::class,'store']);
+    Route::post('/delivery-notes',[DeliveryNoteController::class,'store']);
     Route::get('/delivery-notes/{id}',[DeliveryNoteController::class,'show']);
     Route::put('/delivery-notes/{id}',[DeliveryNoteController::class,'update']);
     Route::delete('/delivery-notes/{id}',[DeliveryNoteController::class,'destroy']);
