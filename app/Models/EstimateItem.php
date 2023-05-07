@@ -14,8 +14,8 @@ class EstimateItem extends Model
         "account_id",
         "estimate_id",
         "description",
-        "unity_price",
+        "unit_price",
         "quantity",
-        "quantity_unity"
+        "quantity_unit"
     ];
 }

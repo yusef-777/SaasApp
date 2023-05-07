@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('delivery_notes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->constrained('accounts')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('invoice_id')->constrained('invoices')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('estimate_id')->constrained('estimates')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('invoice_id')->nullable()->constrained('invoices')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade')->onUpdate('cascade');
             $table->string('no');
             $table->date('issued_at');
             $table->string('status')->default('en cours');

@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Client;
+use App\Models\Invoice;
 use App\Models\Estimate;
+use App\Models\InvoiceItem;
+use App\Models\DeliveryNote;
 use App\Models\EstimateItem;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -50,19 +53,51 @@ class EstimateController extends Controller
 
         // if ($request->no === null) {
         //     $latestEstimate = Estimate::where('account_id', $user->account_id)
-        //         ->where('client_id', $request->client_id)
         //         ->orderBy('created_at', 'desc')
         //         ->first();
         //     if ($latestEstimate) {
-        //         $incrementeNo =  str_pad($latestEstimate->no + 1, 4, '0', STR_PAD_LEFT);
-        //         $estimate->no = $incrementeNo;
+        //         $estimate->no = $latestEstimate->no + 1;
         //     } else {
-        //         $estimate->no = '0001';
+        //         $estimate->no = '1';
         //     }
         // } else {
+        //     $estimate->no = $request->no;
         // }
-        
-        $estimate->no = $request->no;
+
+        if ($request->no === null) {
+            $latestEstimate = Estimate::where('account_id', $user->account_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $currentYear = substr(date('Y'), 2);
+
+            if ($latestEstimate) {
+                $parts = explode('/', $latestEstimate->no);
+                $newNo = ((int)$parts[0]) + 1;
+                $estimate->no = $newNo . '/' . $currentYear;
+            } else {
+                $estimate->no = '1/' . $currentYear;
+            }
+        } else {
+            $estimate->no = $request->no;
+        }
+
+
+        // if ($request->no === null) {
+        //     $latestEstimate = Estimate::where('account_id', $user->account_id)
+        //         ->orderBy('created_at', 'desc')
+        //         ->first();
+        //     if ($latestEstimate) {
+        //         $x = explode('-', $latestEstimate->no);
+        //         $numbers = ((int)$x[1]) + 1;
+        //         $caracters =$x[0];
+        //         $estimate->no = $caracters.'-' . $numbers;
+        //     } else {
+        //         $estimate->no = 'AB-1';
+        //     }
+        // } else {
+        //     $estimate->no = $request->no;
+        // }
+
         $estimate->client_id = $request->client_id;
         $estimate->issued_at = date_create_from_format('d/m/Y', $request->issued_at);
         $estimate->vat = $request->vat;
@@ -190,7 +225,7 @@ class EstimateController extends Controller
 
         return Validator::make($request->all(), [
 
-            'no' => ['string', $uniqueRule],
+            'no' => ['string', 'regex:/^\d+\/\d{2}$/', $uniqueRule],
             'client_id' => [
                 'required',
                 Rule::exists('clients', 'id')->where(function ($query) use ($user) {
@@ -229,7 +264,35 @@ class EstimateController extends Controller
 
         return response()->json($nextNo);
     }
+
+    public function toInvoice($id)
+    {
+        $estimate = Estimate::find($id);
+        $invoice = new Invoice;
+        $invoice->account_id = $estimate->account_id;
+        $invoice->estimate_id = $estimate->id;
+        $invoice->created_by = $estimate->created_by;
+        $invoice->no = $estimate->no;
+        $invoice->client_id = $estimate->client_id;
+        $invoice->issued_at = $estimate->issued_at;
+        $invoice->vat = $estimate->vat;
+        $invoice->status = $estimate->status;
+        $invoice->save();
+        foreach ($estimate->items as $estimateItem) {
+            $invoiceItem = new InvoiceItem;
+            $invoiceItem->account_id = $estimate->account_id;
+            $invoiceItem->invoice_id = $invoice->id;
+            $invoiceItem->description = $estimateItem['description'];
+            $invoiceItem->unit_price = $estimateItem['unit_price'];
+            $invoiceItem->quantity = $estimateItem['quantity'];
+            $invoiceItem->quantity_unit = $estimateItem['quantity_unit'];
+            $invoiceItem->save();
+        }
+
+        return response()->json(array_merge($invoice->toArray(), [
+            'client' => Estimate::find($id)->client,
+            "items" => Estimate::find($id)->items,
+        ]), 201);
+    }
+    
 }
-// AB-111
-// 11111
-// 111/111

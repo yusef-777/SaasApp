@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
-use App\Models\User;
+use App\Models\DeliveryNote;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
@@ -196,5 +197,29 @@ class InvoiceController extends Controller
             'items.*.unity_price' => 'required|numeric'
 
         ]);
+    }
+    public function toDeliveryNote($id)
+    {
+        // fix this function 
+        $invoice = Invoice::find($id);
+        $deliveryNote = new DeliveryNote;
+        $deliveryNote->account_id = $invoice->account_id;
+        $deliveryNote->invoice_id = $invoice->id;
+        $deliveryNote->client_id = $invoice->client_id;
+        $deliveryNote->no = $invoice->no;
+        $deliveryNote->issued_at = $invoice->issued_at;
+        foreach ($invoice->items as $invoiceItem) {
+            $invoiceItem = new InvoiceItem;
+            $invoiceItem->account_id = $invoice->account_id;
+            $invoiceItem->delivery_note_id = $deliveryNote->id;
+            $invoiceItem->description = $invoiceItem['description'];
+            $invoiceItem->quantity = $invoiceItem['quantity'];
+            $invoiceItem->quantity_unit = $invoiceItem['quantity_unit'];
+            $invoiceItem->save();
+        }
+        return response()->json(array_merge($invoice->toArray(), [
+            'client' => Invoice::find($id)->client,
+            "items" => Invoice::find($id)->items,
+        ]), 201);
     }
 }
