@@ -51,52 +51,21 @@ class EstimateController extends Controller
         $estimate->account_id = $user->account_id;
         $estimate->created_by = $user->id;
 
-        // if ($request->no === null) {
-        //     $latestEstimate = Estimate::where('account_id', $user->account_id)
-        //         ->orderBy('created_at', 'desc')
-        //         ->first();
-        //     if ($latestEstimate) {
-        //         $estimate->no = $latestEstimate->no + 1;
-        //     } else {
-        //         $estimate->no = '1';
-        //     }
-        // } else {
-        //     $estimate->no = $request->no;
-        // }
-
         if ($request->no === null) {
             $latestEstimate = Estimate::where('account_id', $user->account_id)
                 ->orderBy('created_at', 'desc')
                 ->first();
-            $currentYear = substr(date('Y'), 2);
-
             if ($latestEstimate) {
-                $parts = explode('/', $latestEstimate->no);
-                $newNo = ((int)$parts[0]) + 1;
-                $estimate->no = $newNo . '/' . $currentYear;
+                $x = explode('-', $latestEstimate->no);
+                $numbers = ((int)$x[1]) + 1;
+                $caracters = $x[0];
+                $estimate->no = $caracters . '-' . $numbers;
             } else {
-                $estimate->no = '1/' . $currentYear;
+                $estimate->no = 'AB-1';
             }
         } else {
             $estimate->no = $request->no;
         }
-
-
-        // if ($request->no === null) {
-        //     $latestEstimate = Estimate::where('account_id', $user->account_id)
-        //         ->orderBy('created_at', 'desc')
-        //         ->first();
-        //     if ($latestEstimate) {
-        //         $x = explode('-', $latestEstimate->no);
-        //         $numbers = ((int)$x[1]) + 1;
-        //         $caracters =$x[0];
-        //         $estimate->no = $caracters.'-' . $numbers;
-        //     } else {
-        //         $estimate->no = 'AB-1';
-        //     }
-        // } else {
-        //     $estimate->no = $request->no;
-        // }
 
         $estimate->client_id = $request->client_id;
         $estimate->issued_at = date_create_from_format('d/m/Y', $request->issued_at);
@@ -244,6 +213,7 @@ class EstimateController extends Controller
 
         ]);
     }
+    
     public function nextNo()
     {
         $user = Auth::user();
@@ -294,5 +264,4 @@ class EstimateController extends Controller
             "items" => Estimate::find($id)->items,
         ]), 201);
     }
-    
 }

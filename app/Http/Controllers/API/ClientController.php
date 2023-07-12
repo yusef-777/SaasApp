@@ -4,9 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Client;
 use Illuminate\Http\Request;
+use App\Exports\ClientExport;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Imports\ClientImport;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
@@ -16,6 +19,7 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
+        // return 'ee';
         $pageSizeParam = $request['page-size'];
         $keywordParam = $request['keyword'];
 
@@ -47,7 +51,7 @@ class ClientController extends Controller
             'if_no' => 'nullable|string|max:50',
             'rc_no' => 'nullable|string|max:180|min:2',
             'cnss_no' => 'nullable|string|max:50|min:10',
-            'address' => 'nullable|string|max:50|min:10',
+            'address' => 'nullable|string|max:50|min:4',
             'phone_number' => 'nullable|string|max:15'
         ]);
 
@@ -141,5 +145,25 @@ class ClientController extends Controller
             return response()->json([], JsonResponse::HTTP_NO_CONTENT);
         }
     }
+    public function exportClients()
+    {
+        return Excel::download(new ClientExport, 'clients.xlsx');
+    }
 
+    public function importClients(Request $request)
+    {
+        $account_id = Auth::user()->account_id;
+        try {
+            Excel::import(new ClientImport($account_id), $request->file('file'));
+
+            return response()->json([
+                'message' => 'Import completed successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error occurred during import',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

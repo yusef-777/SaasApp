@@ -73,9 +73,6 @@ class SecurityController extends Controller
             return response()->json($e->errors(), 422);
         }
 
-        
-
-
         $account = new Account();
         $account->save();
         $id = $account->id;

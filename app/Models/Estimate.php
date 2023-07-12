@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Estimate extends Model
 {
     use HasFactory;
+
+    const PENDING_STATUS = 'pedning';
+    const ACCEPTED_STATUS = 'accepted';
+    const CANCELED_STATUS = 'canceled';
+
     protected $fillable = [
         "account_id",
         "created_by",

@@ -6,6 +6,7 @@ use Exception;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use App\Models\PaymentMethod;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -25,6 +26,7 @@ class PaymentController extends Controller
         } else {
             return response()->json('Payment Not Found', JsonResponse::HTTP_NOT_FOUND);
         }
+        // 
     }
 
     /**
@@ -35,37 +37,49 @@ class PaymentController extends Controller
         $user = Auth::user();
         $account_id = $user->account_id;
 
+        $rules = [
+            'invoice_id' => ['required', Rule::exists('invoices', 'id')],
+            'amount' => 'required|integer|min:1',
+            'paid_at' => 'date_format:Y/m/d|required',
+            'payment_method' => [
+                'required',
+                Rule::exists('payment_methods', 'named_id'),
+            ],
+        ];
+
+        if ($request->payment_method === PaymentMethod::CHEQUE_ID) {
+            $rules['check_no'] = 'required|integer|digits:10';
+            $rules['bank_name'] = 'nullable|string|max:20';
+        }
+
         try {
-            $this->validate($request, [
-                //payment
-                'created_by'=> 'required|string|max:100',
-                'amount'=> 'required|integer|min:1',
-                'paid_at'=> 'date_format:Y/m/d|required',
-                'check_no'=> 'nullable|integer|digits:10',
-                'bank_name'=> 'nullable|string|max:20',
-                //payment method
-                // 'name'=> 'unique:payment_methods, name',
-                // 'named_id'=> 'unique:payment_methods, named_id|integer'
-            ]);
+            $this->validate($request, $rules);
         } catch (ValidationException $e) {
             return response()->json($e->errors(), JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
-        
-        $paymentMethod = PaymentMethod::create([
-            'name'=> $request->name,
-            'named_id'=> $request->named_id
-        ]);
-        $payment = Payment::create([
-            'account_id'=> $account_id,
-            'invoice_id'=> $request->invoice_id,
-            'created_by'=> $request->created_by,
-            'amount'=> $request->amount,
-            'paid_at'=> $request->paid_at,
-            'payment_method_id'=> $paymentMethod->id,
-            'check_no'=> $request->check_no,
-            'bank_name'=> $request->bank_name
-        ]);
-        return response()->json("Payment Created Successfully", JsonResponse::HTTP_CREATED);
+
+        $paymentMethod = PaymentMethod::where('named_id', $request->payment_method)->first();
+
+        $data = [
+            'account_id' => $account_id,
+            'invoice_id' => $request->invoice_id,
+            'created_by' => $user->id,
+            'amount' => $request->amount,
+            'paid_at' => $request->paid_at,
+            'payment_method_id' => $paymentMethod->id,
+        ];
+
+        if ($paymentMethod->named_id === PaymentMethod::CHEQUE_ID) {
+            $data['check_no'] = $request->check_no;
+            $data['bank_name'] = $request->bank_name;
+        }
+
+        $payment = Payment::create($data);
+
+        return response()->json(
+            Payment::find($payment->id),
+            JsonResponse::HTTP_CREATED
+        );
     }
 
     /**
@@ -90,21 +104,21 @@ class PaymentController extends Controller
         $user = Auth::user();
         $payment = Payment::find($id)->first();
 
-        if(!$payment || $payment->account_id != $user->account_id) {
+        if (!$payment || $payment->account_id != $user->account_id) {
             return response()->json("Payment Not Found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         try {
             $this->validate($request, [
                 //payment
-                'created_by'=> 'required|string|max:100',
-                'amount'=> 'required|integer|min:1',
-                'paid_at'=> 'date_format:m/d/Y|required',
-                'check_no'=> 'nullable|integer|digits:10',
-                'bank_name'=> 'nullable|string|max:20',
+                'created_by' => 'required|string|max:100',
+                'amount' => 'required|integer|min:1',
+                'paid_at' => 'date_format:m/d/Y|required',
+                'check_no' => 'nullable|integer|digits:10',
+                'bank_name' => 'nullable|string|max:20',
                 //payment method
-                'name'=> 'payment_methods, name',
-                'named_id'=> 'payment_methods, named_id'
+                'name' => 'payment_methods, name',
+                'named_id' => 'payment_methods, named_id'
             ]);
         } catch (ValidationException $e) {
             return response()->json($e, JsonResponse::HTTP_UNPROCESSABLE_ENTITY);

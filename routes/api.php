@@ -28,12 +28,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/clients', [ClientController::class, 'index']);
+    Route::get('/clients', [ClientController::class, 'index']);
     Route::post('/clients', [ClientController::class, 'store']);
     Route::get('/clients/{id}', [ClientController::class, 'show']);
     Route::put('/clients/{id}', [ClientController::class, 'update']);
     Route::delete('/clients/{id}', [ClientController::class, 'destroy']);
+    Route::post('/clients/import-clients', [ClientController::class, 'importClients']);
 });
+Route::get('/export-clients', [ClientController::class, 'exportClients']);
+
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/estimates', [EstimateController::class, 'index']);
@@ -50,7 +53,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/invoices/{id}', [InvoiceController::class, 'show']);
     Route::put('/invoices/{id}', [InvoiceController::class, 'update']);
     Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy']);
-    Route::post('/estimates/to-delivery-note/{id}', [EstimateController::class, 'toInvoice']);
+    Route::post('/invoices/to-delivery-note/{id}', [InvoiceController::class, 'toDeliveryNote']);
 });
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/delivery-notes', [DeliveryNoteController::class, 'index']);

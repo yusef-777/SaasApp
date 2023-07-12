@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', function() {
-    return 'this is a test page';
-});
+// Route::get('/x', [ClientController::class, 'exportClients']);

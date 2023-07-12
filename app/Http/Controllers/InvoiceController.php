@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\DeliveryNote;
+use App\Models\DeliveryNoteItem;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
@@ -200,7 +201,7 @@ class InvoiceController extends Controller
     }
     public function toDeliveryNote($id)
     {
-        // fix this function 
+
         $invoice = Invoice::find($id);
         $deliveryNote = new DeliveryNote;
         $deliveryNote->account_id = $invoice->account_id;
@@ -208,14 +209,16 @@ class InvoiceController extends Controller
         $deliveryNote->client_id = $invoice->client_id;
         $deliveryNote->no = $invoice->no;
         $deliveryNote->issued_at = $invoice->issued_at;
+        $deliveryNote->save();
         foreach ($invoice->items as $invoiceItem) {
-            $invoiceItem = new InvoiceItem;
-            $invoiceItem->account_id = $invoice->account_id;
-            $invoiceItem->delivery_note_id = $deliveryNote->id;
-            $invoiceItem->description = $invoiceItem['description'];
-            $invoiceItem->quantity = $invoiceItem['quantity'];
-            $invoiceItem->quantity_unit = $invoiceItem['quantity_unit'];
-            $invoiceItem->save();
+            $deliveryNoteItem = new DeliveryNoteItem;
+            // $deliveryNoteItem->account_id = $invoice->account_id;
+
+            $deliveryNoteItem->delivery_note_id = $deliveryNote->id;
+            $deliveryNoteItem->description = $invoiceItem['description'];
+            $deliveryNoteItem->quantity = $invoiceItem['quantity'];
+            $deliveryNoteItem->quantity_unit = $invoiceItem['quantity_unit'];
+            $deliveryNoteItem->save();
         }
         return response()->json(array_merge($invoice->toArray(), [
             'client' => Invoice::find($id)->client,
