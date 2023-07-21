@@ -46,7 +46,6 @@ class PaymentController extends Controller
                 Rule::exists('payment_methods', 'named_id'),
             ],
         ];
-
         if ($request->payment_method === PaymentMethod::CHEQUE_ID) {
             $rules['check_no'] = 'required|integer|digits:10';
             $rules['bank_name'] = 'nullable|string|max:20';
